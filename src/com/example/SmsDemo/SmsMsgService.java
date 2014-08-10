@@ -9,7 +9,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
-import com.tuenti.smsradar.*;
+
 
 import java.util.Date;
 
@@ -23,7 +23,7 @@ public class SmsMsgService extends Service {
     private static final String CONTENT_SMS_URI = "content://sms";
     private static final int ONE_SECOND = 1000;
     /**
-     * 
+     *
      */
     private static final int SMSMSG_RECEIVER_PRIORITY = 2147483647;
 
