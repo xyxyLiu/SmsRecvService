@@ -61,19 +61,7 @@ public class MainActivity extends Activity {
     }
 
     private void initializeSmsRadarService() {
-        /*
-        SmsRadar.initializeSmsRadarService(this, new SmsListener() {
-            @Override
-            public void onSmsSent(Sms sms) {
-                showSmsToast(sms);
-            }
 
-            @Override
-            public void onSmsReceived(Sms sms) {
-                showSmsToast(sms);
-            }
-        });
-*/
         SmsMonitor.initializeSmsMsgService(this, new SmsMsgListener() {
             @Override
             public void onSmsMsgReceived(SmsMsg msg) {
@@ -94,18 +82,11 @@ public class MainActivity extends Activity {
     }
 
     private void stopSmsRadarService() {
-        /*
-        SmsRadar.stopSmsRadarService(this);
-        */
+      
         SmsMonitor.stopSmsMsgService(this);
     }
 
-    /*
-    private void showSmsToast(Sms sms) {
-        Log.i(TAG,"showSmsToast: " + sms.toString() );
-        Toast.makeText(this, sms.toString(), Toast.LENGTH_LONG).show();
-    }
-    */
+
 
     private void showSmsToast(SmsMsg msg) {
         Log.i(TAG,"showSmsToast: " + msg.toString() );
