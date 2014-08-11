@@ -21,6 +21,7 @@ public class MainActivity extends Activity {
     public static String TAG = "SMS_MainActivity";
     private Button startService;
     private Button stopService;
+    private int test;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -30,6 +31,7 @@ public class MainActivity extends Activity {
         setContentView(R.layout.main);
         mapGui();
         hookListeners();
+        test = 1;
     }
 
 	@Override
@@ -61,6 +63,10 @@ public class MainActivity extends Activity {
         super.onDestroy();
         Log.i(TAG,"onDestroy()");
 	    printActivityLog();
+        test = 2;
+        System.gc();
+        System.gc();
+        System.gc();
     }
 
 	public void printActivityLog()
@@ -78,6 +84,8 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View view) {
                 Log.i(TAG, "start SmsRadarService");
+                startService.setText("started");
+                stopService.setText("stop");
                 initializeSmsRadarService();
             }
         });
@@ -86,6 +94,8 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View view) {
                 Log.i(TAG, "stop SmsRadarService");
+                startService.setText("start");
+                stopService.setText("stopped");
                 stopSmsRadarService();
             }
         });
@@ -93,22 +103,7 @@ public class MainActivity extends Activity {
 
     private void initializeSmsRadarService() {
 
-        SmsMonitor.initializeSmsMsgService(this, new SmsMsgListener() {
-            @Override
-            public void onSmsMsgReceived(SmsMsg msg) {
-                Log.i(TAG,"onSmsMsgReceived()");
-                showSmsToast(msg);
-                Vibrator vibrator = (Vibrator)getSystemService(Service.VIBRATOR_SERVICE);
-                vibrator.vibrate(3000);
-
-                /*
-                Intent intent = new Intent(getApplicationContext(),MainActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                getApplication().startActivity(intent);
-                */
-                showAlertDialog(getApplicationContext(),msg);
-            }
-        });
+        SmsMonitor.initializeSmsMsgService(this,SmsMsgService.class);
 
     }
 
@@ -124,50 +119,6 @@ public class MainActivity extends Activity {
         Toast.makeText(this, msg.toString(), Toast.LENGTH_LONG).show();
     }
 
-    private void showAlertDialog(Context context,SmsMsg msg) {
 
-        Log.i(TAG,"MainActivity.this is " + (MainActivity.this  == null?"NULL":"NOT NULL"));
-
-        //获取电源的服务
-        PowerManager powerManagerm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-        //获取系统服务
-        KeyguardManager keyguardManager = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
-
-        final PowerManager.WakeLock wakeLock = powerManagerm.newWakeLock(PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.SCREEN_DIM_WAKE_LOCK, "My Tag");
-        final KeyguardManager.KeyguardLock keyguardLock = keyguardManager.newKeyguardLock("");
-
-
-        final MediaPlayer mp = MediaPlayer.create(MainActivity.this, R.raw.alarm);
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("AlertDialog");
-        builder.setMessage(msg.getMsg());
-        builder.setPositiveButton("Sure", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-
-            mp.stop();
-            keyguardLock.reenableKeyguard();
-            wakeLock.release();
-            }
-        });
-        AlertDialog dialog = builder.create();
-        dialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);//use alert.
-        // dialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY);
-
-
-
-        wakeLock.acquire();
-        Log.i("Log : ", "------>mKeyguardLock");
-        //禁用显示键盘锁定
-        keyguardLock.disableKeyguard();
-
-
-        dialog.show();
-        mp.setLooping(true);
-
-        mp.setVolume(1.0f,1.0f);
-        mp.start();
-    }
 
 }

@@ -1,109 +1,76 @@
 package com.example.SmsDemo;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
+import android.app.AlertDialog;
+import android.app.KeyguardManager;
 import android.app.Service;
-import android.content.*;
-import android.net.Uri;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.IBinder;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.media.MediaPlayer;
+import android.os.PowerManager;
+import android.os.Vibrator;
 import android.util.Log;
-
-
-import java.util.Date;
+import android.view.WindowManager;
 
 /**
- * Created by liu on 2014/8/10.
+ * Created by liu on 2014/8/12.
  */
-public class SmsMsgService extends Service {
-
-
-    public static String TAG = "SMS_SmsMsgService";
-    private static final String CONTENT_SMS_URI = "content://sms";
-    private static final int ONE_SECOND = 1000;
-    /**
-     *
-     */
-    private static final int SMSMSG_RECEIVER_PRIORITY = 2147483647;
-
-    private ContentResolver contentResolver;
-    private boolean initialized;
-
-    private SmsMsgReceiver mSmsMsgReceiver;
+public class SmsMsgService extends BaseSmsMsgService {
 
 
     @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        registerReceivers();
-    }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.i(TAG, "onStartCommand()");
-        if (!initialized) {
-            Log.i(TAG, "onStartCommand(): initializeService");
-            initService();
-        }
-
-        return START_STICKY;
-    }
-
-    @Override
-    public void onDestroy() {
-        Log.i(TAG, "onStartCommand()");
-        super.onDestroy();
-        finService();
-    }
-
-    @Override
-    public void onTaskRemoved(Intent rootIntent) {
-        Log.i(TAG, "onTaskRemoved()");
-        super.onTaskRemoved(rootIntent);
-        restartService();
-    }
-
-    void initService()
+    protected void onReceiveSmsMsg(SmsMsg smsMsg)
     {
-        Log.i(TAG,"initService()");
+
+
+        //获取电源的服务
+        PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        //获取系统服务
+        KeyguardManager keyguardManager = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
+
+        final PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.SCREEN_DIM_WAKE_LOCK, "My Tag");
+        final KeyguardManager.KeyguardLock keyguardLock = keyguardManager.newKeyguardLock("");
+
+
+        final MediaPlayer mp = MediaPlayer.create(this, R.raw.alarm);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("AlertDialog");
+        builder.setMessage(smsMsg.getMsg());
+        builder.setPositiveButton("Sure", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                mp.stop();
+                //keyguardLock.reenableKeyguard();
+                wakeLock.release();
+
+                Intent intent = new Intent(SmsMsgService.this, MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                SmsMsgService.this.getApplicationContext().startActivity(intent);
+            }
+        });
+        AlertDialog dialog = builder.create();
+        dialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);//use alert.
+        // dialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY);
+
+
+
+        wakeLock.acquire();
+        Log.i("Log : ", "------>mKeyguardLock");
+        //禁用显示键盘锁定
+        keyguardLock.disableKeyguard();
+
+        dialog.show();
+
+        mp.setLooping(true);
+        mp.setVolume(1.0f,1.0f);
+        mp.start();
+
+        Vibrator vibrator = (Vibrator)getSystemService(Service.VIBRATOR_SERVICE);
+        vibrator.vibrate(3000);
 
     }
 
-    void finService()
-    {
-        Log.i(TAG,"finService()");
-        unregisterReceivers();
-    }
-
-    void restartService()
-    {
-        Log.i(TAG,"restartService()");
-        Intent intent = new Intent(this, SmsMsgService.class);
-        PendingIntent pendingIntent = PendingIntent.getService(this, 0, intent, 0);
-
-        long now = new Date().getTime();
-        AlarmManager alarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
-        alarmManager.set(AlarmManager.RTC_WAKEUP, now + ONE_SECOND, pendingIntent);
-
-    }
-
-    void registerReceivers()
-    {
-        IntentFilter filter = new IntentFilter("android.provider.Telephony.SMS_RECEIVED");
-        filter.setPriority(SMSMSG_RECEIVER_PRIORITY);
-        mSmsMsgReceiver = new SmsMsgReceiver();
-        registerReceiver(mSmsMsgReceiver, filter);
-    }
-
-    void unregisterReceivers()
-    {
-        unregisterReceiver(mSmsMsgReceiver);
-    }
 
 }

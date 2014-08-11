@@ -10,7 +10,7 @@ import android.util.Log;
 public class SmsMonitor {
 
     public static String TAG = "SMS_SmsMonitor";
-    static SmsMsgListener smsMsgListener;
+    public static Class<? extends BaseSmsMsgService> serviceClass;
 
 
     /**
@@ -18,12 +18,13 @@ public class SmsMonitor {
      * inside the SMS content provider
      *
      * @param context used to start the service
-     * @param smsMsgListener to notify when the sms content provider gets a new sms
+     * @param c to notify when the sms content provider gets a new sms
      */
-    public static void initializeSmsMsgService(Context context, SmsMsgListener smsMsgListener) {
+    public static void initializeSmsMsgService(Context context, Class<? extends BaseSmsMsgService> c) {
         Log.i(TAG,"initializeSmsMsgService()");
-        SmsMonitor.smsMsgListener = smsMsgListener;
-        Intent intent = new Intent(context, SmsMsgService.class);
+        SmsMonitor.serviceClass = c;
+        Log.i(TAG,"SmsMonitor.serviceClass.getName() = " + SmsMonitor.serviceClass.getName());
+        Intent intent = new Intent(context, SmsMonitor.serviceClass);
         Log.i(TAG, "initializeSmsMsgService(): start SmsMsgService");
         context.startService(intent);
     }
@@ -34,8 +35,8 @@ public class SmsMonitor {
      * @param context used to stop the service
      */
     public static void stopSmsMsgService(Context context) {
-        SmsMonitor.smsMsgListener = null;
-        Intent intent = new Intent(context, SmsMsgService.class);
+        //SmsMonitor.smsMsgListener = null;
+        Intent intent = new Intent(context, SmsMonitor.serviceClass);
         context.stopService(intent);
     }
 }

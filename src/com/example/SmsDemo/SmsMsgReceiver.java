@@ -1,11 +1,9 @@
 package com.example.SmsDemo;
 
-import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Vibrator;
 import android.telephony.SmsMessage;
 import android.util.Log;
 import android.widget.Toast;
@@ -18,6 +16,7 @@ import java.util.Date;
 public class SmsMsgReceiver extends BroadcastReceiver{
 
     public static String TAG = "SMS_SmsMsgReceiver";
+
 
     static
     {
@@ -65,9 +64,15 @@ public class SmsMsgReceiver extends BroadcastReceiver{
                 }
             }
 
-            SmsMonitor.smsMsgListener.onSmsMsgReceived(msg);
+            //SmsMonitor.smsMsgListener.onSmsMsgReceived(msg);
             Toast.makeText(context,sb.toString(),Toast.LENGTH_LONG).show();
 
+
+            Intent serviceIntent = new Intent(context, SmsMonitor.serviceClass);
+            Bundle serviceBundle = new Bundle();
+            serviceBundle.putSerializable("msg",msg);
+            serviceIntent.putExtras(serviceBundle);
+            context.startService(serviceIntent);
         }
     }
 

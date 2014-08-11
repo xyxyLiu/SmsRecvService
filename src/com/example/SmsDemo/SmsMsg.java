@@ -1,9 +1,11 @@
 package com.example.SmsDemo;
 
+import java.io.Serializable;
+
 /**
  * Created by liu on 2014/8/10.
  */
-public class SmsMsg {
+public class SmsMsg implements Serializable {
 
     private final String address;
     private final String date;
