@@ -1,7 +1,5 @@
 package com.example.SmsDemo;
 
-import com.tuenti.smsradar.SmsType;
-
 /**
  * Created by liu on 2014/8/10.
  */

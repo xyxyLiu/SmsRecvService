@@ -18,11 +18,12 @@
         </activity>
 
 
-        <!-- Services -->
+        <!-- Services
         <service
                 android:name="com.tuenti.smsradar.SmsRadarService"
                 android:exported="false"
                 android:label="@string/app_name"/>
+        -->
 
         <service
                 android:name="com.example.SmsDemo.SmsMsgService"

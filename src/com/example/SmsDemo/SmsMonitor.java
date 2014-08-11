@@ -3,8 +3,6 @@ package com.example.SmsDemo;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
-import com.tuenti.smsradar.SmsListener;
-import com.tuenti.smsradar.SmsRadarService;
 
 /**
  * Created by liu on 2014/8/10.

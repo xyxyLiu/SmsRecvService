@@ -25,17 +25,48 @@ public class MainActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         Log.i(TAG,"onCreate()");
+	    printActivityLog();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         mapGui();
         hookListeners();
     }
 
+	@Override
+	public void onResume()
+	{
+		super.onResume();
+		Log.i(TAG,"onResume()");
+		printActivityLog();
+	}
+
+	@Override
+	public void onPause()
+	{
+		super.onPause();
+		Log.i(TAG,"onPause()");
+		printActivityLog();
+	}
+
+	@Override
+	public void onStop()
+	{
+		super.onStop();
+		Log.i(TAG,"onStop()");
+		printActivityLog();
+	}
+
     @Override
     public void onDestroy() {
         super.onDestroy();
         Log.i(TAG,"onDestroy()");
+	    printActivityLog();
     }
+
+	public void printActivityLog()
+	{
+		Log.i(TAG,"MainActivity.this = " + MainActivity.this);
+	}
 
     private void mapGui() {
         startService = (Button) findViewById(R.id.bt_start_service);
