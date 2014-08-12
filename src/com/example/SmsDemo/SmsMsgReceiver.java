@@ -16,17 +16,30 @@ import java.util.Date;
 public class SmsMsgReceiver extends BroadcastReceiver{
 
     public static String TAG = "SMS_SmsMsgReceiver";
+	private Class<? extends  BaseSmsMsgService> serviceClass;
 
+	static
+	{
+		Log.i(TAG,"create SmsMsgReceiver");
+	}
 
-    static
-    {
-        Log.i(TAG,"create SmsMsgReceiver");
-    }
+	public SmsMsgReceiver(Intent intent)
+	{
+		if(intent != null)
+		{
+			serviceClass = (Class<? extends BaseSmsMsgService>)intent.getExtras().getSerializable("class");
+		}
+		else
+		{
+			serviceClass = null;
+		}
+	}
+
 
     @Override
     public void onReceive(Context context, Intent intent)
     {
-        Log.i(TAG, "onReceive() ");
+        Log.i(TAG, "receiverId = " + this + ", onReceive() ");
 
         if(intent.getAction().equals("android.provider.Telephony.SMS_RECEIVED"))
         {
@@ -65,11 +78,15 @@ public class SmsMsgReceiver extends BroadcastReceiver{
             }
 
             //SmsMonitor.smsMsgListener.onSmsMsgReceived(msg);
+	        Log.i(TAG,"Toast");
             Toast.makeText(context,sb.toString(),Toast.LENGTH_LONG).show();
 
-
-            Intent serviceIntent = new Intent(context, SmsMonitor.serviceClass);
+			Log.i(TAG, "context = " + (context == null ? "NULL":context.getPackageName()) + ", SmsMonitor.serviceClass = " + serviceClass);
+            Intent serviceIntent = new Intent(context, serviceClass);
             Bundle serviceBundle = new Bundle();
+
+
+
             serviceBundle.putSerializable("msg",msg);
             serviceIntent.putExtras(serviceBundle);
             context.startService(serviceIntent);

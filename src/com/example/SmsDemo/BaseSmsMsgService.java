@@ -18,15 +18,17 @@ public abstract class BaseSmsMsgService extends Service {
     private static final String CONTENT_SMS_URI = "content://sms";
     private static final int ONE_SECOND = 1000;
     /**
-     *
+     * Highest Priority
      */
     private static final int SMSMSG_RECEIVER_PRIORITY = 2147483647;
+	private static final int BOOT_RECEIVER_PRIORITY = 2147483647;
 
     private ContentResolver contentResolver;
     private boolean initialized;
+	private boolean isBoot;
 
     private SmsMsgReceiver mSmsMsgReceiver;
-
+	private SmsBootReceiver mSmsBootReceiver;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -48,13 +50,16 @@ public abstract class BaseSmsMsgService extends Service {
             initService();
         }
 
-        Bundle bundle = intent.getExtras();
-        if(bundle != null) {
-            SmsMsg smsMsg = (SmsMsg) bundle.getSerializable("msg");
-            if (smsMsg != null) {
-                onReceiveSmsMsg(smsMsg);
-            }
-        }
+	    if(intent != null) {
+
+		    Bundle bundle = intent.getExtras();
+		    if (bundle != null) {
+			    SmsMsg smsMsg = (SmsMsg) bundle.getSerializable("msg");
+			    if (smsMsg != null) {
+				    onReceiveSmsMsg(smsMsg);
+			    }
+		    }
+	    }
         return START_STICKY;
     }
 
@@ -97,15 +102,58 @@ public abstract class BaseSmsMsgService extends Service {
 
     void registerReceivers()
     {
-        IntentFilter filter = new IntentFilter("android.provider.Telephony.SMS_RECEIVED");
-        filter.setPriority(SMSMSG_RECEIVER_PRIORITY);
-        mSmsMsgReceiver = new SmsMsgReceiver();
-        registerReceiver(mSmsMsgReceiver, filter);
+	    registerSmsReceiver();
+	    if( SmsMonitor.getSmsStorage(this).getIsBoot()) {
+		    registerBootReceiver();
+	    }
     }
+
+	public void registerSmsReceiver()
+	{
+		Log.i(TAG,"registerReceivers(): new SmsMsgReceiver(intent) with SmsMonitor.getSmsStorage(this).getServiceClass().getName() = " + SmsMonitor.getSmsStorage(this).getServiceClass().getName());
+		IntentFilter filter = new IntentFilter("android.provider.Telephony.SMS_RECEIVED");
+		filter.setPriority(SMSMSG_RECEIVER_PRIORITY);
+		if( mSmsMsgReceiver == null) {
+
+		Intent intent = new Intent();
+		Bundle bundle = new Bundle();
+		bundle.putSerializable("class", SmsMonitor.getSmsStorage(this).getServiceClass());
+		intent.putExtras(bundle);
+
+		mSmsMsgReceiver = new SmsMsgReceiver(intent);
+
+		Log.i(TAG, "register receiver: " +  mSmsMsgReceiver);
+		registerReceiver( mSmsMsgReceiver, filter);
+		}
+	}
+
+	public void registerBootReceiver()
+	{
+		Log.i(TAG,"registerBootReceiver()");
+		IntentFilter filter = new IntentFilter("android.intent.action.BOOT_COMPLETED");
+		filter.setPriority(BOOT_RECEIVER_PRIORITY);
+
+		Log.i(TAG,"registerBootReceivers...");
+		Intent intent = new Intent();
+		Bundle bundle = new Bundle();
+		bundle.putSerializable("class", SmsMonitor.getSmsStorage(this).getServiceClass());
+		intent.putExtras(bundle);
+
+		mSmsBootReceiver = new SmsBootReceiver(intent);
+
+		Log.i(TAG, "register boot receiver: " + mSmsBootReceiver);
+		registerReceiver(mSmsBootReceiver, filter);
+
+	}
+
+
 
     void unregisterReceivers()
     {
-        unregisterReceiver(mSmsMsgReceiver);
+	    if( mSmsMsgReceiver != null) {
+		    unregisterReceiver(mSmsMsgReceiver);
+		    Log.i(TAG, "unregister receiver: " + mSmsMsgReceiver);
+	    }
     }
 
 

@@ -103,7 +103,7 @@ public class MainActivity extends Activity {
 
     private void initializeSmsRadarService() {
 
-        SmsMonitor.initializeSmsMsgService(this,SmsMsgService.class);
+        SmsMonitor.initializeSmsMsgService(this,SmsMsgService.class,true);
 
     }
 

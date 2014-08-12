@@ -46,7 +46,7 @@ public class SmsMsgService extends BaseSmsMsgService {
                 wakeLock.release();
 
                 Intent intent = new Intent(SmsMsgService.this, MainActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK );
                 SmsMsgService.this.getApplicationContext().startActivity(intent);
             }
         });
@@ -67,8 +67,8 @@ public class SmsMsgService extends BaseSmsMsgService {
         mp.setVolume(1.0f,1.0f);
         mp.start();
 
-        Vibrator vibrator = (Vibrator)getSystemService(Service.VIBRATOR_SERVICE);
-        vibrator.vibrate(3000);
+        //Vibrator vibrator = (Vibrator)getSystemService(Service.VIBRATOR_SERVICE);
+        //vibrator.vibrate(3000);
 
     }
 
