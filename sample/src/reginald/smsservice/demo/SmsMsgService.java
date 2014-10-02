@@ -6,13 +6,11 @@ import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.media.MediaPlayer;
 import android.os.PowerManager;
-import android.util.Log;
 import android.view.WindowManager;
 import reginald.smsservice.SmsMsg;
 import reginald.smsservice.SmsMsgBaseService;
-import reginald.smsservice.R;
+import android.R;
 
 /**
  * Created by liu on 2014/8/12.
@@ -32,7 +30,7 @@ public class SmsMsgService extends SmsMsgBaseService {
 
         Intent notificationIntent = new Intent(this, DemoActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
-        Notification notification = new Notification(R.drawable.ic_launcher, "new incoming sms!",
+        Notification notification = new Notification(R.drawable.ic_dialog_alert, "new incoming sms!",
                 System.currentTimeMillis());
         notification.setLatestEventInfo(this, "lastest sms from " + smsMsg.getAddress(),
                 smsMsg.getMsg(), pendingIntent);
@@ -63,7 +61,7 @@ public class SmsMsgService extends SmsMsgBaseService {
     @Override
     public void onCreate() {
         super.onCreate();
-        Notification notification = new Notification(R.drawable.ic_launcher, "SmsRecvService started ...",
+        Notification notification = new Notification(R.drawable.ic_dialog_alert, "SmsRecvService started ...",
                 System.currentTimeMillis());
         Intent notificationIntent = new Intent(this, DemoActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);

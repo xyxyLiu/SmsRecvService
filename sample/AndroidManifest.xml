@@ -19,14 +19,6 @@
             </intent-filter>
         </activity>
 
-
-        <!-- Services
-        <service
-                android:name="com.tuenti.smsradar.SmsRadarService"
-                android:exported="false"
-                android:label="@string/app_name"/>
-        -->
-
         <service
                 android:name="reginald.smsservice.demo.SmsMsgService"
                 android:exported="false"
@@ -34,6 +26,7 @@
                 android:process=":smsServ"
                 />
 
+        <!-- register boot complete receiver to start sms service -->
         <receiver android:name="reginald.smsservice.SmsBootReceiver">
            <intent-filter android:priority="2147483647">
                <action android:name="android.intent.action.BOOT_COMPLETED"></action>

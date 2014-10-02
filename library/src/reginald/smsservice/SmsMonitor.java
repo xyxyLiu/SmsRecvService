@@ -1,7 +1,9 @@
 package reginald.smsservice;
 
 import android.app.ActivityManager;
-import android.content.*;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 
 /**
  * Created by liu on 2014/8/10.
