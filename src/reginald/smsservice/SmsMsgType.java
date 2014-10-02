@@ -1,4 +1,4 @@
-package com.example.SmsDemo;
+package reginald.smsservice;
 
 /**
  * Created by liu on 2014/8/10.

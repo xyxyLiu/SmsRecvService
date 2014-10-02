@@ -1,6 +1,9 @@
-package com.example.SmsDemo;
+package reginald.smsservice;
+
+import android.telephony.SmsMessage;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * Created by liu on 2014/8/10.
@@ -69,5 +72,29 @@ public class SmsMsg implements Serializable {
                 ", type=" + type +
                 '}';
     }
+
+    public static SmsMsg[] getSmsMsgsFromPdus(Object[] pdus, SmsMsgType smsType) {
+
+        SmsMsg[] msgArray = new SmsMsg[pdus.length];
+        SmsMessage[] messages = new SmsMessage[pdus.length];
+        for (int i = 0; i < pdus.length; i++) {
+            messages[i] = SmsMessage.createFromPdu((byte[]) pdus[i]);
+        }
+        int i = 0;
+        for (SmsMessage message : messages) {
+            String date = null;
+            try {
+                date = new Date(message.getTimestampMillis()).toString();
+            } catch (Exception e) {
+
+            }
+            SmsMsg msg = new SmsMsg(message.getDisplayOriginatingAddress(), date, message.getDisplayMessageBody(), smsType);
+            msgArray[i] = msg;
+            i++;
+        }
+        return msgArray;
+    }
+
+
 }
 
